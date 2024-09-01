@@ -1,0 +1,73 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Basic Platformer")
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+# Clock for controlling frame rate
+clock = pygame.time.Clock()
+
+# Character settings
+CHAR_WIDTH, CHAR_HEIGHT = 50, 50
+CHAR_X, CHAR_Y = WIDTH // 2, HEIGHT - CHAR_HEIGHT
+CHAR_VEL = 5
+JUMP_VEL = 10
+gravity = 0.5
+is_jumping = False
+jump_count = JUMP_VEL
+
+# Platform settings
+PLATFORM_WIDTH, PLATFORM_HEIGHT = WIDTH, 50
+platform_x, platform_y = 0, HEIGHT - PLATFORM_HEIGHT
+
+# Game loop
+running = True
+while running:
+    clock.tick(60)  # Frame rate
+
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Key presses
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        CHAR_X -= CHAR_VEL
+    if keys[pygame.K_RIGHT]:
+        CHAR_X += CHAR_VEL
+    if not is_jumping:
+        if keys[pygame.K_SPACE]:
+            is_jumping = True
+    else:
+        if jump_count >= -JUMP_VEL:
+            CHAR_Y -= (jump_count * abs(jump_count)) * 0.5
+            jump_count -= 1
+        else:
+            is_jumping = False
+            jump_count = JUMP_VEL
+
+    # Gravity
+    if CHAR_Y + CHAR_HEIGHT < HEIGHT - PLATFORM_HEIGHT:
+        CHAR_Y += gravity
+    else:
+        CHAR_Y = HEIGHT - PLATFORM_HEIGHT - CHAR_HEIGHT
+
+    # Drawing
+    screen.fill(WHITE)
+    pygame.draw.rect(screen, BLACK, (CHAR_X, CHAR_Y, CHAR_WIDTH, CHAR_HEIGHT))
+    pygame.draw.rect(screen, RED, (platform_x, platform_y, PLATFORM_WIDTH, PLATFORM_HEIGHT))
+
+    pygame.display.flip()
+
